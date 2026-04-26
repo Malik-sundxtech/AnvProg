@@ -10,8 +10,7 @@ class SensorEvaluator:
         pass
 
     def kvalitets_test(self, mes=0, valid=0, invalid=0):
-        pass
-        for i in range (mes):
+        for m in range (mes):
             if m.is_valid() #Funktion fra fakeSensor i Measurment
                 valid = valid+1
             else:
@@ -31,18 +30,29 @@ class SensorEvaluator:
 # SKAL HAVE FUNDET UD AF HVORDAN 
 
 
+
+# Dette skal med:
 evaluator = SensorEvaluator(
     sensor=FakeSensor(sensor_id="sensor-v1", sensor_type="PPG"),
     device_id="sensor-v1",
     name="Pulsmåler v1"
 )
+
+evaluator.tag_maalinger(mes=1000)   
+
 measurement = Measurement.is_valid()
 
-evaluator.tag_maalinger(mes=1000)   # Mange målinger for pålidelig statistik!
 report = evaluator.kvalitets_test()
 
-# print(evaluator)
 
+
+
+
+
+
+
+# print(evaluator)
+# Mange målinger for pålidelig statistik! - skal lave 1000 målinger
 
 # {
 #   "total_measurements": 1000,
