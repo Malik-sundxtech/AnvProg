@@ -1,4 +1,17 @@
-Test
+På min windows computer skal jeg for at køre jupyter notebook brugefølgende kommando:
+```bash
+python -m notebook
+```
+
+**Flowchart notation:** \
+Cirkler = start/stop \
+Rektangler = handling \
+Romber = beslutninger(ja/nej)
+
+**Class Diagram notation:** \
+"+" = public \
+"-" = private \
+"#" = protected 
 
 
 ```mermaid
