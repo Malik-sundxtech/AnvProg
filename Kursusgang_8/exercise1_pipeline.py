@@ -111,6 +111,7 @@ plt.scatter(ECG_timestamps[r_peaks1], env_ECG1[r_peaks1], color = "red", label =
 #plt.scatter(ECG_timestamps[t_peaks1], env_ECG1[t_peaks1], color = "black")
 
 
+
 """
 t_peaks1 = [] # Laver tom liste
 t_peaks2 = [] # Laver tom liste
@@ -143,4 +144,3 @@ for i in range(len(RR1)): # Burde kunne dobbel loope this one
 plt.legend()
 plt.show()
 """
-

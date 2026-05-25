@@ -62,7 +62,6 @@ class SensorEvaluator():
             print(f"Numbers of {sensor_type} sensors passed the test: {passed_sensors / sensor_n*100} % ")
             print("\n")
 
-
 # Kører scriptet herinde
 if __name__ == "__main__":
     SensorEvaluator.quality_report(1000) # sensorer testes 1000 gange
