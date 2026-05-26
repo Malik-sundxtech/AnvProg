@@ -70,36 +70,32 @@ if __name__ == "__main__":
     for i in range(len(ECG_signal_lst)):
         ECG_signal_lst[i] = DP.bandpass(ECG_signal_lst[i], fs_ECG, lowcut_ECG, highcut_ECG)
     
-    for i in range(len(ppg_sig_lst)): # Ydre matrix/liste er 2 lang
-        for j in range(len(ppg_sig_lst[i])): # Indre matrix/liste er 4 lang
-            ppg_sig_lst[i][j] = DP.bandpass(ppg_sig_lst[i][j], fs_PPG, lowcut_PPG, highcut_PPG)
+    for day in range(len(ppg_sig_lst)): # Ydre matrix/liste er 2 lang
+        for ch in range(len(ppg_sig_lst[day])): # Indre matrix/liste er 4 lang
+            ppg_sig_lst[day][ch] = DP.bandpass(ppg_sig_lst[day][ch], fs_PPG, lowcut_PPG, highcut_PPG)
     
     ##### Udtræk features #####
-    rr_mean_lst = []
-    amp_mean_lst = []
-    rt_mean_lst = []
+    rr_lst = []
+    amp_lst = []
+    rt_lst = []
     for i in range(len(ECG_signal_lst)):
-        r_peaks, r_amplitude, rr_int, thr_ecg = FE.r_peaks(ECG_signal_lst[i], fs_ECG, thr_mult_ECG)
+        r_peaks, r_amplitude, rr_int, thr_ecg = FE._r_peaks(ECG_signal_lst[i], fs_ECG, thr_mult_ECG)
         t_peaks = FE.t_peaks(ECG_signal_lst[i], r_peaks, rr_int)
-
-        rr_mean = np.mean(rr_int)
-        amp_mean = np.mean(r_amplitude["peak_heights"])
 
         t_peaks = np.array(t_peaks)
         match_r_peaks = r_peaks[:len(t_peaks)]
         rt_int = t_peaks - match_r_peaks
-        rt_mean = np.mean(rt_int)
 
-        rr_mean_lst.append(rr_mean)
-        amp_mean_lst.append(amp_mean)
-        rt_mean_lst.append(rt_mean)
+        rr_lst.append(rr_int)
+        amp_lst.append(r_amplitude["peak_heights"])
+        rt_lst.append(rt_int)
     
     ppi_lst = [[], []]
     pulse_width_lst = [[], []]
 
     for i in range(len(ppg_sig_lst)):
         for j in range(len(ppg_sig_lst[i])):
-            ppg_peak, ppg_amplitude, ppi, thr = FE.r_peaks(ppg_sig_lst[i][j], fs_PPG, thr_mult_PPG)
+            ppg_peak, ppg_amplitude, ppi, thr = FE._r_peaks(ppg_sig_lst[i][j], fs_PPG, thr_mult_PPG)
             pulse_width, onset_idx, offset_idx = FE.pulse_width_onoff(time_ppg_lst[i], ppg_sig_lst[i][j])
 
             ppi_lst[i].append(ppi)
@@ -107,11 +103,11 @@ if __name__ == "__main__":
     
     ##### Plot værdierne #####
     feature_label_ecg = ["rr", "amplitude", "rt"]
-    data_ecg = [rr_mean_lst, amp_mean_lst, rt_mean_lst]
+    data_ecg = [rr_lst, amp_lst, rt_lst]
 
     for i in range(len(feature_label_ecg)):
-        x = np.concatenate(data_ecg[0][i])
-        y = np.concatenate(data_ecg[1][i])
+        x = np.array(data_ecg[i][0]) # i = hvilken feature der ønskes og 0/1 = dag 1/2
+        y = np.array(data_ecg[i][1])
 
         shortest_list = min(len(x), len(y)) # Kan kun plotte hvis listerne er lige lange
         x = x[:shortest_list]
@@ -120,29 +116,51 @@ if __name__ == "__main__":
 
         plt.title(f"Day 1 and 2 for {feature_label_ecg[i]}")
         plt.scatter(x, y)
-        plt.plot(x, y_pred, label = (f"{a:.2f}x + {b:.2f}, Determinations koefficient = {r2:.2f}"))
+        plt.plot(x, y_pred, label = (f"{a:.2f}x + {b:.2f}, r² = {r2:.2f}"))
         plt.xlabel("Day 1")
         plt.ylabel("Day 2")
         plt.legend()
+        filename = f"Workshops/Workshop_2/files_generated/{feature_label_ecg[i]}_list.png"
+        DP.save_plot(filename)
         plt.show()
 
     feature_label_ppg = ["PPI", "Pulse Width"]
+    measurement_label_ppg = ["c880", "c660", "b880", "b660"]
     days_label = ["Day 1", "Day 2"]
     data_ppg = [ppi_lst, pulse_width_lst]
 
-    for i in range(len(feature_label_ppg)):
-        x = np.concatenate(data_ppg[0][i]) # Bruges til at samle arrays, som ellers kan være svære at plotte
-        y = np.concatenate(data_ppg[1][i])
-        # i = featuren (PPI eller Pulse width)
-        shortest_list = min(len(x), len(y)) # Kan kun plotte hvis listerne er lige lange
-        x = x[:shortest_list]
-        y = y[:shortest_list]
-        a, b, y_pred, r2 = DA.LinReg(x, y)
+    for feat in range(len(feature_label_ppg)):
+        for ch in range(len(measurement_label_ppg)):
+            x = data_ppg[feat][0][ch] # Bruges til at samle arrays, som ellers kan være svære at plotte
+            y = data_ppg[feat][1][ch]
 
-        plt.title(f"Day 1 and 2 for {feature_label_ppg[i]}")
-        plt.scatter(x, y)
-        plt.plot(x, y_pred, label = (f"{a:.2f}x + {b:.2f}, Determinations koefficient = {r2:.2f}"))
-        plt.xlabel("Day 1")
-        plt.ylabel("Day 2")
-        plt.legend()
-        plt.show()
+            shortest_list = min(len(x), len(y)) # Kan kun plotte hvis listerne er lige lange
+            x = x[:shortest_list]
+            y = y[:shortest_list]
+            a, b, y_pred, r2 = DA.LinReg(x, y)
+
+            plt.title(f"Day 1 and 2 for {feature_label_ppg[feat]} - {measurement_label_ppg[ch]}")
+            plt.scatter(x, y)
+            plt.plot(x, y_pred, label = (f"{a:.2f}x + {b:.2f}, r² = {r2:.2f}"))
+            plt.xlabel("Day 1")
+            plt.ylabel("Day 2")
+            plt.legend()
+            DP.save_plot(f"Workshops/Workshop_2/files_generated/{feature_label_ppg[feat]}_{measurement_label_ppg[ch]}.png")
+            plt.show()
+
+    ##### Gem csv filer #####
+    for day in range(2):
+        shortest_list = min(len(data_ecg[feat][day]) for feat in range(len(feature_label_ecg))) # Finder de korteste lister
+        day_data = [data_ecg[feat][day][:shortest_list] for feat in range(len(feature_label_ecg))] # Slicer data
+        filename = f"Workshops/Workshop_2/files_generated/ecg_results_day{day+1}.csv"
+        DP.save_csv(filename, feature_label_ecg, np.column_stack(day_data))
+            
+    for feat in range(len(feature_label_ppg)):
+        for day in range(2): 
+            shortest_list = min(len(data_ppg[feat][day][ch]) for ch in range(len(measurement_label_ppg))) # Finder de korteste lister
+            day_data = [data_ppg[feat][day][ch][:shortest_list] for ch in range(len(measurement_label_ppg))] # Slicer data
+            header = [f"{feature_label_ppg[feat]}_{measurement_label_ppg[ch]}" for ch in range(len(measurement_label_ppg))]
+            filename = f"Workshops/Workshop_2/files_generated/{feature_label_ppg[feat]}_day{day+1}.csv"
+            DP.save_csv(filename, header, np.column_stack(day_data))
+            # PPG CSV filen bliver meget kort pga. pulse width er meget kort, og de to features skal være lige lange for at
+            # gemme i samme liste. Alternativt kunne de gemmes hver i seperate csv filer, så behøves de ikke matche i længde

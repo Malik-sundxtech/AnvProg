@@ -27,16 +27,35 @@ Forkortelser:
     p, pk = peak
     sig = signal
     inv = inverted
+    feat = feature
+    ch = channel
+    pw = pulse width
+    ppi = pulse to pulse interval
 
 
 ##### Besvarelse af spørgsmål ######
 Fortolkning af resultater:
 Etiske overvejelser: databeskyttelse, anonymitet og dataminimering
+Generelt laves data pirvate(__) hvis der er tale om patient sensitiv data fx råt EMG signal, der kan fungere som
+finger aftryk. private data kan ikke tilgås udenfor klassen
+Beskyttet data(_) er data der er mindre sensitive, og ikke bør tilgås udenfor en klasse men er ikke så kritisk som fx et råt emg
+signal. Dette kunne fx være en thr eller en linear regression lavet ud fra data, som ikke siger lige så meget om patienten
+Note: __ kan være lidt sværere at arbejde fordi programmet selv ikke kan tilgå data nogen gange, og derfor benyttes dette 
+kun når det er absolut nødvendigt
+Rå patient data bør altid være privat
+Offentlig data for scripts som databehandler og plotter/illusterer som ikke indeholder patient data som udgangspunkt
+Fx bandpass, plot, save_csv
+
+Hvis en subklasse skal bruge overskrive værdier (dvs. 2 forskellige klasser arbejder sammen) er det meget svært at 
+bruge private klasser og bør derfor aller højest være beskyttet, for at det er muligt for dem at snakke sammen
+
 
 Skal yderligere implementeres: 
     beskyttet data
     Her lige fundet ud af der findes en peak_widths funktion:
     https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
+
+    np.concatenate kan samle lister (dvs. at en 2x2 liste bare bliver til en 2D liste frem for en 3D)
 """
 
 
@@ -58,13 +77,20 @@ import numpy as np
 import scipy.signal as sps
 
 # Definer relevante klasser og metoder
-class DataProcessing():
-    def extract_file(self, filepath):
+class DataProcessing(): 
+    def __extract_file(self, filepath): 
         return np.genfromtxt(filepath, 
                              unpack=True,
                              delimiter=",",
                              autostrip=True, 
                              skip_header=1)
+    def extract_file(self, filepath):
+        return self.__extract_file(filepath)
+    """ Eksempel på en privat metode
+    __ gør at man ikke direkte kan kalde denne metode i scriptet, og derfor skal der laves en public metode
+    så den private metode faktisk kan anvendes
+    """
+    
     def save_csv(self, filepath, headers, data): # Gemmer data i en csv fil
         np.savetxt(filepath, data, delimiter=",", header=",".join(headers), comments="")
 
@@ -79,15 +105,19 @@ class DataProcessing():
         return filtered_bandpass_signal
     
 class FeatureExtractor():
-    def r_peaks(self, signal, fs, thr_multiplier, time_interval = 0.5):
+    def _r_peaks(self, signal, fs, thr_multiplier, time_interval = 0.5):
         thr = np.mean(signal) + thr_multiplier*np.std(signal) 
         dst = fs*time_interval
-
         r_peaks, r_ampltidues = sps.find_peaks(signal, distance = dst, height = thr)
         # Height er threshold (y-aksen)
         # Distance er hvor lang tid (x-aksen) der skal gå for der kan findes et nyt toppunkt
         interval = np.diff(r_peaks)
         return r_peaks, r_ampltidues, interval, thr
+    """ Eksempel på beksyttet metode
+    Modsat en privat metode så kan beskyttede metoder godt kaldes direkte i koden 
+    og kan derfor benyttes ligesom en helt almindelig metode
+    """
+
     
     def t_peaks(self, signal, r_peaks, rr_int):
         t_peaks = []
@@ -164,7 +194,7 @@ if __name__ == "__main__":
     ECG_signal = DP.bandpass(ECG_signal, fs_ECG, lowcut_ECG, highcut_ECG)
 
     # Udtrækker features
-    r_peaks, r_amplitude, rr_int, thr_ecg = FE.r_peaks(ECG_signal, fs_ECG, thr_mult_ECG)
+    r_peaks, r_amplitude, rr_int, thr_ecg = FE._r_peaks(ECG_signal, fs_ECG, thr_mult_ECG)
     t_peaks = FE.t_peaks(ECG_signal, r_peaks, rr_int)
 
     # Finder en gennemsnittelig værdi af features
@@ -209,7 +239,7 @@ if __name__ == "__main__":
     offset_idx_list = []
 
     for i in range(len(ppg_sig)):
-        ppg_peak, ppg_amplitude, ppi, thr = FE.r_peaks(ppg_sig[i], fs_PPG, thr_mult_PPG)
+        ppg_peak, ppg_amplitude, ppi, thr = FE._r_peaks(ppg_sig[i], fs_PPG, thr_mult_PPG)
         ppg_peaks.append(ppg_peak)
         ppg_amplitudes.append(ppg_amplitude)
         ppi_list.append(np.mean(ppi))
@@ -225,10 +255,10 @@ if __name__ == "__main__":
 
     # Printer værdier
     measurement_labels = ["c880", "c660", "b880", "b660"]
-    for i in range(len(ppg_sig)):
-        print(f"PPI for {measurement_labels[i]} is {ppi_list[i]:.2f}")
-        print(f"Pulse-width for {measurement_labels[i]} is {pulse_width_list[i]:.2f}")
-    
+    for label, ppi, pw in zip(measurement_labels, ppi_list, pulse_width_list):
+        print(f"PPI for {label} is {ppi:.2f}")
+        print(f"Pulse-width for {label} is {pw:.2f}")
+    # Et forsøg på en ny måde at gøre det på, zip gør at man ikke behøver at skrive [i] hver gang den looper
 
     # Plotter PPG signaler
     colors = ["blue", "green", "orange", "red"]
