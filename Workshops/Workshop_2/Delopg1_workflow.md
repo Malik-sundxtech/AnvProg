@@ -2,12 +2,10 @@ Note md filer:
 Dobbel space fungerer som enter
 
 Note flowchart:  
-Rune former(()) - start/slut  
+Runde former(()) - start/slut  
 Firkantet[] - scriptet gør noget  
 Diamant{}- Decision(true/false)
 
-Hver enhed skal testes 1000 ganges (1000 samples)  
-Der skal desuden testes 1000 enheder (dvs. 1,000,000 tests i alt)
 ```mermaid
 flowchart TD
 S((Start))
