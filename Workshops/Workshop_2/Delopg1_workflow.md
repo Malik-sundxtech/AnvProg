@@ -4,7 +4,7 @@
 Note flowchart:  
 Runde former(()) - start/slut  
 Firkantet[] - scriptet gør noget  
-Diamant{}- Decision(true/false)
+Diamant{} - Decision(true/false)
 
 ```mermaid
 flowchart TD
