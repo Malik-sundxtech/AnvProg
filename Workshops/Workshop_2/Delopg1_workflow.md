@@ -1,5 +1,5 @@
-Note md filer:
-Dobbel space fungerer som enter
+# Worhop 2 delopgave 1
+
 
 Note flowchart:  
 Runde former(()) - start/slut  
