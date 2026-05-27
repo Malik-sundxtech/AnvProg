@@ -21,7 +21,7 @@ sv[Gem plots og data i png og csv filer]
 
 E((End))
 
-S --> L --> F --> R --> T --> int --> ppi --> pw --> plt --> sv - E
+S --> L --> F --> R --> T --> int --> ppi --> pw --> plt --> sv --> E
 
 
 ```
