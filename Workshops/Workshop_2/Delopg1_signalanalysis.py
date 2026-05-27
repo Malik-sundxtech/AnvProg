@@ -172,7 +172,7 @@ class FeatureExtractor():
         return pulse_width_list, ppg_min_idx
     
     def pulse_width_find_widths(self):
-        pass
+        pass # Idk, hvis jeg får tid til at implementere sps.peak_widths 
 
 
 # Kører scriptet herinde
