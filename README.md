@@ -4,7 +4,7 @@ git clone https://github.com/Malik-sundxtech/AnvProg
 ```
 Husk du skal have et aktivt venv for at køre koden
 
-Se et godt eksempel på et flowchart og klassediagrammer i [her](Workshops/Workshop_2/Delopg1_workflow.md)
+Se et godt eksempel på et flowchart og klassediagram i [her](Workshops/Workshop_2/Delopg1_workflow.md)
 
 
 # Noter til mig selv
