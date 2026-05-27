@@ -26,7 +26,7 @@ S --> L --> F --> R --> T --> int --> ppi --> pw --> plt --> sv --> E
 
 ```
 Note klassediagrammer: \
-purblic, protected og privat påvirker noteres såldes og påvirker tilgændelighed i scriptet således: \
+purblic, protected og privat noteres såldes og påvirker tilgændelighed i scriptet således: \
 +(Public) - tilgængelig overalt \
 #(Beskyttet) - kun tilgængelig i egen klasse og subklasser(subklasse, en klasse der får værdier fra en anden klasse) \
 -(Privat) - Kun tilgængelig i egen klasse (andre klasser kan ikke få værdier herfra)
