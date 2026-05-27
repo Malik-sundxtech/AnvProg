@@ -1,0 +1,13 @@
+if 3 < 10:
+    ...
+
+n = 1
+match n:
+    case 1:
+        ...
+    case 3:
+        ...
+
+    case _:
+        # otherwise
+        ...
