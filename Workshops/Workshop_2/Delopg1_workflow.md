@@ -31,7 +31,7 @@ purblic, protected og privat noteres såldes og påvirker tilgændelighed i scri
 #(Beskyttet) - kun tilgængelig i egen klasse og subklasser(subklasse, en klasse der får værdier fra en anden klasse) \
 -(Privat) - Kun tilgængelig i egen klasse (andre klasser kan ikke få værdier herfra)
 
-Note til klassediagram: der benyttes angives kun variabler hvis de gemmes i klassen fx ved:
+Note til klassediagram: Variabler angives kun hvis de gemmes i klassen vha. self fx ved:
 ```
 self.test = test
 ```
